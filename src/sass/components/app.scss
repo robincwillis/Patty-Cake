@@ -1,0 +1,37 @@
+$blue : #7cebff;
+
+body {
+  font-family: -apple-system, sans-serif;
+	background: $blue;
+}
+
+.block {
+	margin: 20px 0;
+	&.center {
+		text-align: center;
+		input, a, p, span, ul, li , pre, section, header, aside {
+			text-align: left;
+		}
+	}
+}
+
+.pull-right {
+	float : right;
+}
+
+.pull-left {
+	float : left;
+}
+
+.center {
+	text-align: center
+}
+
+.button.reset-button,
+.button.switch-view {
+	display: none;
+}
+
+audio {
+	opacity:0;
+}

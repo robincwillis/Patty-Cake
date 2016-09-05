@@ -1,0 +1,171 @@
+
+.mole {
+	position:fixed;
+	bottom:0;
+	right:50%;
+	width:405px;
+	height:291px;
+	margin-right:-202px;
+	background: url('../../images/mole.png');
+	background-size: cover;
+  background-repeat: no-repeat;
+}
+
+
+.file-input {
+
+	h2 {
+    text-transform: lowercase;
+  margin-bottom: 8px;
+	}
+
+	p {
+    margin: 10px 0 20px;
+    background: #fff;
+    padding: 4px 8px;
+	}
+
+	input {
+			width: 0.1px;
+			height: 0.1px;
+			opacity: 0;
+			overflow: hidden;
+			position: absolute;
+			z-index: -1;
+	}
+
+	input + label {
+		font-size:10px;
+    color: white;
+    background-color: darkblue;
+    display: inline-block;
+    cursor: pointer; /* "hand" cursor */
+    text-align: center;
+    padding: 12px 24px;
+	}
+
+	input:focus + label,
+	input + label:hover {
+	}
+
+}
+
+
+.main {
+
+	.block {
+		display: none;
+	}
+
+	.block.input-dir,
+	.block.output-dir,
+	.block.process {
+		height: 77px;
+		position: fixed;
+		top: 215px;
+		left: 0;
+		text-align: center;
+		width: 100%;
+		h2 {
+			text-transform: uppercase;
+			margin:10px 0;
+			color:#fff;
+		}
+	}
+
+	.block.in-progress {
+		position:fixed;
+		top:0;
+		left:0;
+		width:100%;
+		height:266px;
+
+		.patty-cake {
+			margin:auto;
+			width:600px;
+			height:266px;
+			background:url('../../images/frames/frame-9.png');
+	  	animation-name: patty-cake;
+			animation-duration: 5s;
+			animation-iteration-count: infinite;
+
+		}
+	}
+
+
+	.block.process{
+		height: 98px;
+		top:200px;
+	}
+
+
+	&.GET_STARTED {
+		.block.get-started {
+			display: block;
+		}
+	}
+
+	&.INPUT {
+		.block.input-dir {
+			display: block;
+		}
+
+	}
+
+	&.OUTPUT {
+		.block.output-dir {
+			display: block;
+		}
+	}
+
+	&.PROCESS {
+		.block.process {
+			display: block;
+		}
+	}
+
+	&.IN_PROGRESS {
+		.block.in-progress {
+			display: block;
+		}
+	}
+
+	&.PLAY {
+		.block.play {
+			display: block;
+		}
+	}
+
+}
+
+
+@keyframes patty-cake {
+    0%   {
+    	background:url('../../images/frames/frame-1.png');
+    }
+   	11%  {
+    	background:url('../../images/frames/frame-2.png');
+    }
+    22%  {
+    	background:url('../../images/frames/frame-3.png');
+    }
+    33% {
+    	background:url('../../images/frames/frame-4.png');
+    }
+    44% {
+    	background:url('../../images/frames/frame-5.png');
+    }
+    55% {
+    	background:url('../../images/frames/frame-6.png');
+    }
+    66% {
+    	background:url('../../images/frames/frame-7.png');
+    }
+    77% {
+    	background:url('../../images/frames/frame-8.png');
+    }
+    88% {
+    	background:url('../../images/frames/frame-9.png');
+    }
+
+}

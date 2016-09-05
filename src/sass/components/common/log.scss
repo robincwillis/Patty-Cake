@@ -1,0 +1,67 @@
+pre {
+	background: darkblue;
+  display: block;
+  min-width: 200px;
+  min-height: 100px;
+	height: 500px;
+  margin:20px 0;
+  overflow-y: auto;
+  color : #fff;
+  padding:10px;
+
+	font-size: 11px;
+	font-family: "Andale Mono",AndaleMono,monospace;
+
+	 ul {
+	 	> li {
+			border-bottom: 1px solid blue;
+			padding: 5px;
+
+			.status {
+		    width: 90px;
+		    display: block;
+		    font-size:14px;
+		    margin:3px 0;
+			}
+			.input {
+				display: block;
+				margin:3px 0;
+			}
+			.output {
+				display: block;
+				margin:3px 0;
+			}
+
+
+			&.created {
+
+			}
+
+			&.merge-start, {
+				color : black;
+		    background: green;
+				 border-bottom: 1px solid darkgreen;
+			}
+
+			&.merge-finish {
+				color: black;
+		    background: SpringGreen;
+				 border-bottom: 1px solid green;
+			}
+
+			&.error {
+				background : red;
+				border-bottom: 1px solid maroon;
+				.output {
+					float:none;
+					display: block;
+			    padding-top: 10px;
+				}
+			}
+
+	 	}
+
+
+	 }
+
+}

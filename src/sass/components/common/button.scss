@@ -1,0 +1,78 @@
+.button {
+
+}
+
+
+.button {
+
+  cursor: pointer;
+  outline:none;
+
+  display: inline-block;
+  position: relative;
+  border: none;
+ 	text-transform: uppercase;
+  letter-spacing: 1px;
+  padding: 0px 15px;
+  -webkit-font-smoothing: subpixel-antialiased;
+  cursor: pointer;
+  white-space: nowrap;
+  padding: 12px 18px;
+  background: #000;
+  color: #fff;
+  background-size: cover;
+  background-repeat: no-repeat;
+
+  &:hover,
+  &:focus {
+  }
+
+  &:active,
+  &.active {
+  }
+
+  &.fixed {
+    position: fixed;
+    background-size: cover;
+    background-repeat: no-repeat;
+  }
+
+  &.get-started-button{
+    width:182px;
+    height:162px;
+    background: url('../../../images/start.png');
+  }
+
+  &.input-button{
+    width:77px;
+    height:77px;
+    background: url('../../../images/input.png');
+  }
+
+  &.output-button{
+    width:77px;
+    height:77px;
+    background: url('../../../images/output.png');
+  }
+
+  &.process-button{
+    width:110px;
+    height:110px;
+    background: url('../../../images/process.png');
+  }
+
+  &.play-button{
+    width:181px;
+    height:161px;
+    background: url('../../../images/play.png');
+  }
+
+  &.reset-button{
+    width:92px;
+    height:10px;
+    padding: 0;
+    background: url('../../../images/reset.png');
+  }
+
+
+}
