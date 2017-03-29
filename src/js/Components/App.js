@@ -1,20 +1,29 @@
 import 'sass/components/app';
-
 import React, { Component } from 'react';
 
 import Main from './Main';
 import Debug from './Debug';
-
 import Button from './Common/Button';
-
-
 import { state } from 'application';
-import main from '../lib/main';
+import { main, reset } from '../lib/main';
+
+const initialState = {
+	currentView : 0,
+	views : [0,1],
+	inputDir : null,
+	outputDir : null,
+	stage : 'GET_STARTED',
+	total : 1,
+	outstanding : 1,
+	log : []
+};
 
 export default class App extends Component {
 
 	constructor (props) {
 		super(props);
+
+		this.state = initialState;
 
 		window.state.actions.setProgress = (data) => {
 			this.setState({
@@ -32,7 +41,6 @@ export default class App extends Component {
 				stage : 'PLAY'
 			});
 		};
-
 
 		window.state.actions.setTotal = (total) => {
 			this.setState({
@@ -63,16 +71,12 @@ export default class App extends Component {
 			});
 		};
 
-		this.state = {
-			currentView : props.app.currentView,
-			views : props.app.views,
-			inputDir : null,
-			outputDir : null,
-			stage : 'GET_STARTED',
-			total : 1,
-			outstanding : 1,
-			log : []
-		};
+	}
+
+	reset () {
+		this.setState(initialState);
+		reset();
+		window.location.reload()
 	}
 
 	handleKeyPress = (event) => {
@@ -115,10 +119,6 @@ export default class App extends Component {
 		});
 	}
 
-	reset() {
-		//TODO
-	}
-
 	switchView () {
 		console.log(this.state.stage);
 		let currentView = this.state.currentView;
@@ -141,7 +141,8 @@ export default class App extends Component {
 					inputDir={this.state.inputDir}
 					outputDir={this.state.outputDir}
 					stage={this.state.stage}
-
+					total={this.state.total}
+					outstanding={this.state.outstanding}
 					setStage={this.setStage.bind(this)}
 					setInputDir={this.setInputDir.bind(this)}
 					setOutputDir={this.setOutputDir.bind(this)}

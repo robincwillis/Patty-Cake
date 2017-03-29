@@ -5,6 +5,16 @@ import path from 'path';
 //Util
 //=======
 
+console.log(process);
+
+let resetFlag = false;
+
+var nwPath = process.argv[0];
+var nwDir = path.dirname(nwPath);
+console.log(nwDir);
+var ffmpegPath = nwDir + '/ffmpeg';
+var ffprobePath = nwDir + '/ffprobe';
+
 //Pad string
 function pad(n) {
 		return (n < 10) ? ('0' + n) : n;
@@ -51,15 +61,14 @@ function cleanDirectory (dir) {
 //=======
 export const getDuration = (filePath) => {
 	return new Promise( (resolve, reject) => {
-		taglib.read(filePath, function (err, res, props) {
-				if(err) {
-					//fail silently
-					resolve(err);
-				} else {
-					let minutes = Math.floor(props.length / 60);
-					let seconds = pad(props.length - minutes * 60);
-					resolve({ duration: minutes+"-"+seconds+'.mp3', file : filePath } );
-				}
+		mm(fs.createReadStream(filePath), { duration: true }, function (err, metadata) {
+			if(err) {
+				resolve(err);
+			} else {
+				let minutes = Math.floor(metadata.duration / 60);
+				let seconds = pad(metadata.duration - minutes * 60);
+				resolve({ duration: minutes+"-"+seconds+'.mp3', file : filePath } );
+			}
 		});
 	});
 };
@@ -164,8 +173,10 @@ export function processSignal (signal, inputDir, outputDir) {
 			});
 		}
 
-
 		let command = ffmpeg();
+
+		command.setFfmpegPath(ffmpegPath);
+		command.setFfprobePath(ffprobePath);
 
 		signal.inputFiles.forEach( (inputFile) => {
 			command.addInput(inputFile);
@@ -222,6 +233,13 @@ export function processSignal (signal, inputDir, outputDir) {
 //=======
 export function processSignals (signalQue, inputDir, outputDir) {
 
+	if(signalQue.length > 0 && resetFlag){
+		signalQue = {};
+		resetFlag = false;
+	} else {
+		resetFlag = false;
+	}
+
 	let signalKeys = Object.keys(signalQue);
 	let chunk = Math.min(10, signalKeys.length);
 	let signalPromises = [];
@@ -256,10 +274,9 @@ export function processSignals (signalQue, inputDir, outputDir) {
 
 
 	});
-
 }
 
-export default function main (inputDir, outputDir) {
+export function main (inputDir, outputDir) {
 	cleanDirectory(outputDir);
 	setupDirectory(outputDir);
 
@@ -272,5 +289,10 @@ export default function main (inputDir, outputDir) {
 		window.state.actions.setTotal(Object.keys(signalQue).length);
 		processSignals(signalQue, inputDir, outputDir);
 	});
+}
+
+export function reset () {
+	console.log('calling lib reset');
+	resetFlag = true;
 }
 

@@ -25,8 +25,14 @@ const config = {
 
 			new webpack.HotModuleReplacementPlugin(),
 
+			new webpack.DefinePlugin({
+			  'process.env': {
+			  	'FLUENTFFMPEG_COV' : false
+			  }
+			}),
+
 			new HtmlWebpackPlugin({
-					title : 'Drop Splash',
+					title : 'Patty Cake',
 					template: './src/templates/index.html',
 					filename: 'index.html',
 					inject:'body'
