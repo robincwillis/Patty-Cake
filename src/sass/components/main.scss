@@ -16,7 +16,7 @@
 
 	h2 {
     text-transform: lowercase;
-  margin-bottom: 8px;
+  	margin-bottom: 8px;
 	}
 
 	p {
@@ -25,16 +25,7 @@
     padding: 4px 8px;
 	}
 
-	input {
-			width: 0.1px;
-			height: 0.1px;
-			opacity: 0;
-			overflow: hidden;
-			position: absolute;
-			z-index: -1;
-	}
-
-	input + label {
+	.file-button {
 		font-size:10px;
     color: white;
     background-color: darkblue;
@@ -44,8 +35,7 @@
     padding: 12px 24px;
 	}
 
-	input:focus + label,
-	input + label:hover {
+	.file-input-button:hover {
 	}
 
 }

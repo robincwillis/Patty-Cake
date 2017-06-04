@@ -7,35 +7,42 @@ import View from './Common/View';
 import Button from './Common/Button';
 import Player from './Common/Player';
 
+const { dialog } = require('electron').remote;
+
 export default class ConversionInput extends Component {
 
 	constructor (props) {
 		super(props);
-
-
 	}
 
 	componentDidMount () {
-		//bring this back later
-
-		let inputDir = ReactDOM.findDOMNode(this.refs.inputDir);
-
-		inputDir.setAttribute('nwdirectory', '');
-		inputDir.addEventListener("change", (event) => {
-					this.props.setInputDir(inputDir);
-		}, false);
-
-		let outputDir = ReactDOM.findDOMNode(this.refs.outputDir);
-
-		outputDir.setAttribute('nwdirectory', '');
-		outputDir.addEventListener("change", (event) => {
-			this.props.setOutputDir(outputDir);
-			}, false);
-
 	}
 
 	handleClickGetStarted () {
 		this.props.setStage('INPUT');
+	}
+
+
+	handleFileSelection = (inputDir) => {
+		this.props.setInputDir(inputDir[0]);
+	}
+
+	handleFileSave = (outputDir) => {
+		this.props.setOutputDir(outputDir[0]);
+	}
+
+	handleClickInput () {
+		dialog.showOpenDialog({
+			defaultPath: './',
+			properties: ['openDirectory']
+		}, this.handleFileSelection);
+	}
+
+	handleClickOutput () {
+		dialog.showOpenDialog({
+			defaultPath: './',
+			properties: ['openDirectory']
+		}, this.handleFileSave);
 	}
 
 	renderProcessButton () {
@@ -60,9 +67,6 @@ export default class ConversionInput extends Component {
 
 	content () {
 
-		//if processing done
-			// render play button
-
 		return (
 			<div className={"main " + this.props.stage}>
 
@@ -80,8 +84,7 @@ export default class ConversionInput extends Component {
 			{/* INPUT DIR */}
 			<div className="block input-dir">
 				<div className="file-input">
-					<input id="inputDir" type="file" ref="inputDir" name="inputDir" />
-					<label className="button input-button" htmlFor="inputDir"></label>
+					<div onClick={this.handleClickInput.bind(this)} className="file-button button input-button" />
 					<h2>{this.inputLabel()}</h2>
 				</div>
 			</div>
@@ -89,8 +92,7 @@ export default class ConversionInput extends Component {
 			{/* OUTPUT DIR */}
 			<div className="block output-dir">
 				<div className="file-input">
-					<input id="outputDir" className="file-input" type="file" ref="outputDir" name="outputDir"/>
-					<label className="button output-button" htmlFor="outputDir"></label>
+					<div onClick={this.handleClickOutput.bind(this)} className="file-button button output-button" />
 					<h2>{this.outputLabel()}</h2>
 				</div>
 			</div>
@@ -122,10 +124,9 @@ export default class ConversionInput extends Component {
 					className="fixed reset-button"
 					x="690"
 					y="735"
-					label=""
 					clickHandler={this.props.reset}
 				/>
-				<div className="mole"> </div>
+				<div className="mole" />
 			</div>
 		);
 	}

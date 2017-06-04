@@ -9,7 +9,7 @@ import Button from './Common/Button';
 
 
 import { state } from 'application';
-import main from '../lib/main';
+import tool from '../lib/tool';
 
 export default class App extends Component {
 
@@ -93,14 +93,14 @@ export default class App extends Component {
 
 	setInputDir (inputDir) {
 		this.setState({
-			inputDir : inputDir.value,
+			inputDir : inputDir,
 			stage: 'OUTPUT'
 		});
 	}
 
 	setOutputDir (outputDir) {
 		this.setState({
-			outputDir : outputDir.value,
+			outputDir : outputDir,
 			stage : 'PROCESS'
 		});
 	}
@@ -109,7 +109,7 @@ export default class App extends Component {
 	go () {
 		var input = this.state.inputDir;
 		var output = this.state.outputDir;
-		main(input, output);
+		tool(input, output);
 		this.setState({
 			stage : 'IN_PROGRESS'
 		});

@@ -1,13 +1,23 @@
 import fs from 'fs';
 import path from 'path';
+const mp3Duration = require('mp3-duration');
+const ffmpeg = require('fluent-ffmpeg');
+const ffmpegStatic = require('ffmpeg-static');
 
+console.log('staticPath is');
+console.log(ffmpegStatic.path);
+console.log('testPath is... pretty hacky');
+var testPath = path.resolve(__dirname, '..',ffmpegStatic.path);
+console.log(testPath);
+ffmpeg.setFfmpegPath(testPath);
 //=======
 //Util
 //=======
 
+
 //Pad string
 function pad(n) {
-		return (n < 10) ? ('0' + n) : n;
+	return (n < 10) ? ('0' + n) : n;
 }
 
 //TODO Setup output dir
@@ -50,16 +60,22 @@ function cleanDirectory (dir) {
 //Get the duration(filename) for an mp3
 //=======
 export const getDuration = (filePath) => {
+	console.log('getDuration');
+	console.log(filePath);
 	return new Promise( (resolve, reject) => {
-		taglib.read(filePath, function (err, res, props) {
-				if(err) {
-					//fail silently
-					resolve(err);
-				} else {
-					let minutes = Math.floor(props.length / 60);
-					let seconds = pad(props.length - minutes * 60);
-					resolve({ duration: minutes+"-"+seconds+'.mp3', file : filePath } );
-				}
+		mp3Duration(filePath, function (err, duration) {
+		  if (err) {
+				console.log(err.message);
+		  	//fail silently
+		  	resolve(err);
+		  } else {
+			  console.log('Your file is ' + duration + ' seconds long');
+			  duration = Math.round(duration);
+				let minutes = Math.floor(duration / 60);
+				let seconds = pad(duration - minutes * 60);
+				resolve({ duration: minutes+"-"+seconds+'.mp3', file : filePath } );
+		  }
+
 		});
 	});
 };
@@ -68,6 +84,7 @@ export const getDuration = (filePath) => {
 //Recursively loop though all input directories and create list of mp3 files found
 //=======
 export function getFileList (dir, filelist) {
+	console.log('getFileList');
 
 	let files = fs.readdirSync(dir);
 	filelist = filelist || [];
@@ -76,10 +93,13 @@ export function getFileList (dir, filelist) {
 		if (fs.statSync(dir + '/' + file).isDirectory()) {
 			filelist = getFileList(dir + '/' + file, filelist);
 		}
-		else {
+		//Dumb for now, should prob use glob to only include audio files
+		else if(! /^\..*/.test(file)){
 			filelist.push({dir:dir, file:file});
 		}
 	});
+
+	console.log(filelist);
 	return filelist;
 }
 
@@ -127,12 +147,12 @@ export function buildSignalQue (files) {
 // Process each individual signal
 //=======
 export function processSignal (signal, inputDir, outputDir) {
+	console.log('processSignal =============');
+
 	return new Promise( (resolve, reject) => {
 		let channel = signal.inputFiles.length === 1 ? 1 : 0;
 		let dir = signal.inputFiles.length === 1 ? '/right' : '/left';
 		let outputFile = path.resolve(outputDir+dir, signal.duration.duration);
-
-
 
 		let filterGraph = [];
 
@@ -164,7 +184,6 @@ export function processSignal (signal, inputDir, outputDir) {
 			});
 		}
 
-
 		let command = ffmpeg();
 
 		signal.inputFiles.forEach( (inputFile) => {
@@ -176,7 +195,9 @@ export function processSignal (signal, inputDir, outputDir) {
 		.complexFilter(filterGraph)
 		.audioChannels(2)
 		.audioCodec('libmp3lame')
+
 		.on('start', () =>  {
+			console.log('ffmpeg command start');
 			var entry = {
 				id : new Date().valueOf(),
 				input : signal.inputFiles,
@@ -188,6 +209,7 @@ export function processSignal (signal, inputDir, outputDir) {
 			//console.log('ffmpeg started');
 		})
 		.on('error', (error) => {
+			console.log('ffmpeg command error');
 			var entry = {
 				id : new Date().valueOf(),
 				input : signal.inputFiles,
@@ -200,7 +222,7 @@ export function processSignal (signal, inputDir, outputDir) {
 			resolve({error : error});
 		})
 		.on('end', () => {
-
+			console.log('ffmpeg command ended');
 			var entry = {
 				id : new Date().valueOf(),
 				input : signal.inputFiles,
@@ -253,7 +275,6 @@ export function processSignals (signalQue, inputDir, outputDir) {
 			window.state.actions.setLog(entry);
 			window.state.actions.finish();
 		}
-
 
 	});
 

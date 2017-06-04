@@ -16,7 +16,7 @@ const config = {
 		output: {
 			path: path.resolve(__dirname, 'build'),
 			filename: '[name].js',
-			publicPath: '/build/'
+			publicPath: './'
 		},
 		plugins: [
 			new WebpackNotifierPlugin(),
@@ -33,7 +33,11 @@ const config = {
 			}),
 			new webpack.ProvidePlugin({
         _ : 'underscore'
-      })
+      }),
+      new webpack.DefinePlugin({
+        'process.env.FLUENTFFMPEG_COV': false
+    	}),
+    	new webpack.IgnorePlugin(/vertx/)
 		],
 		module: {
 			loaders: [
@@ -60,13 +64,10 @@ const config = {
 					{
 							test:    /\.js$/,
 							loader:  'babel-loader',
+							exclude: /node_modules(?!\/fluent-ffmpeg)/,
 							query:   {
 									presets: ['es2015', 'react', 'stage-0']
 							}
-					},
-					{
-							test: /\.hbs$/,
-							loader: "handlebars-loader"
 					},
 					{
 							test  : /\/es6-promise\.js$/,
@@ -98,6 +99,10 @@ const config = {
 				alias: {
 					'_' : 'underscore/underscore'
 				}
+		},
+		node: {
+			__filename: true,
+			__dirname: true
 		}
 };
 

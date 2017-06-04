@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 
 import Button from './Button';
-import { getFileList } from '../../lib/main';
+import { getFileList } from '../../lib/tool';
 
 export default class Player extends Component {
 
@@ -76,13 +76,6 @@ export default class Player extends Component {
 		right.play();
 
   }
-
-	// play () {
- //    const right = this.refs.right;
- //    const left = this.refs.left;
-
-	// }
-
 
 	render () {
 		console.log(this.props);
