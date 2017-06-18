@@ -9,25 +9,20 @@ import Button from './Common/Button';
 
 
 import { state } from 'application';
-import tool from '../lib/tool';
+import tool, { triggerReset } from '../lib/tool';
 
 export default class App extends Component {
 
 	constructor (props) {
 		super(props);
 
-		window.state.actions.setProgress = (data) => {
-			this.setState({
-				progress : data.progress
-			});
-		};
-
-		window.state.actions.setLog = (total) => {
+		window.state.actions.reset = () => {
+			// set state back to initial state
+			console.log('reset callback from tool')
 
 		};
 
 		window.state.actions.finish = (result) => {
-			console.log('finished');
 			this.setState({
 				stage : 'PLAY'
 			});
@@ -116,11 +111,26 @@ export default class App extends Component {
 	}
 
 	reset() {
-		//TODO
+		triggerReset();
+		this.setState({
+			currentView : this.props.app.currentView,
+			views : this.props.app.views,
+			inputDir : '',
+			outputDir : '',
+			stage : 'GET_STARTED',
+			total : 1,
+			outstanding : 1,
+			log : []
+		});
+	}
+
+	handleKeyPress = (event) => {
+		if(event.key == 'Enter'){
+			this.switchView()
+		}
 	}
 
 	switchView () {
-		console.log(this.state.stage);
 		let currentView = this.state.currentView;
 		if ( currentView === this.props.app.views.length -1) {
 			currentView = 0;
@@ -131,7 +141,6 @@ export default class App extends Component {
 		this.setState({
 			currentView : currentView
 		});
-
 	}
 
 	renderCurrentView () {
@@ -141,12 +150,13 @@ export default class App extends Component {
 					inputDir={this.state.inputDir}
 					outputDir={this.state.outputDir}
 					stage={this.state.stage}
-
 					setStage={this.setStage.bind(this)}
 					setInputDir={this.setInputDir.bind(this)}
 					setOutputDir={this.setOutputDir.bind(this)}
 					go={this.go.bind(this)}
 					reset={this.reset.bind(this)}
+					total={this.state.total}
+					outstanding={this.state.outstanding}
 					{...this.props}
 				/>);
 			case 1 :
@@ -169,10 +179,9 @@ export default class App extends Component {
 
 	render () {
 		return (
-			<div>
+			<div onKeyPress={this.handleKeyPress}>
 				{this.renderCurrentView()}
 				<Button className="pull-right switch-view" clickHandler={this.switchView.bind(this)} label="Switch View" />
-				{this.state.progress}
 			</div>
 		);
 	}

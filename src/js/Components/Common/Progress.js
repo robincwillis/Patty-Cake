@@ -10,15 +10,21 @@ export default class Progress extends Component {
 
 	}
 
-	render () {
-		console.log('rerender progress');
-		let progress = (1 - (this.props.outstanding / this.props.total)) * 100;
+	progress () {
+		let progress = 0;
+		if(this.props.outstanding && this.props.total) {
+			progress = (1 - (this.props.outstanding / this.props.total)) * 100;
 
-		console.log(this.props);
-		console.log(progress);
+		}
+		return Math.round(progress);
+	}
+
+	render () {
+		console.log('Render progress');
+		console.log(this.progress());
 
 		let styles = {
-			width: progress+'%'
+			width: this.progress()+'%'
 		};
 
 		return (

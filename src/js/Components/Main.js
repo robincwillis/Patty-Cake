@@ -6,6 +6,7 @@ import ReactDOM from 'react-dom';
 import View from './Common/View';
 import Button from './Common/Button';
 import Player from './Common/Player';
+import Progress from './Common/Progress'
 
 const { dialog } = require('electron').remote;
 
@@ -105,6 +106,7 @@ export default class ConversionInput extends Component {
 			{/* IN_PROGRESS */}
 			<div className="block in-progress">
 				<div className="patty-cake">
+					<Progress {...this.props} />
 				</div>
 			</div>
 
@@ -122,8 +124,8 @@ export default class ConversionInput extends Component {
 				<View content={this.content()} {...this.props} />
 				<Button
 					className="fixed reset-button"
-					x="690"
-					y="735"
+					x={window.innerWidth - 120}
+					y={20}
 					clickHandler={this.props.reset}
 				/>
 				<div className="mole" />

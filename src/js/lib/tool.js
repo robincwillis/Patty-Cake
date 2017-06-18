@@ -4,12 +4,22 @@ const mp3Duration = require('mp3-duration');
 const ffmpeg = require('fluent-ffmpeg');
 const ffmpegStatic = require('ffmpeg-static');
 
-console.log('staticPath is');
-console.log(ffmpegStatic.path);
-console.log('testPath is... pretty hacky');
-var testPath = path.resolve(__dirname, '..',ffmpegStatic.path);
-console.log(testPath);
-ffmpeg.setFfmpegPath(testPath);
+const logger = function(message) {
+	if(window.state && window.state.app.debug) {
+		console.log(message);
+	}
+};
+
+logger('staticPath is');
+logger(ffmpegStatic.path);
+logger('ffmpegPath is... pretty hacky');
+
+var ffmpegPath = path.resolve(__dirname, '..',ffmpegStatic.path);
+var reset = false;
+
+logger(ffmpegPath);
+
+ffmpeg.setFfmpegPath(ffmpegPath);
 //=======
 //Util
 //=======
@@ -20,8 +30,9 @@ function pad(n) {
 	return (n < 10) ? ('0' + n) : n;
 }
 
-//TODO Setup output dir
-
+//=======
+//Setup output dir
+//=======
 function setupDirectory (dir) {
 	var right = '/right';
 	var left = '/left';
@@ -39,7 +50,9 @@ function setupDirectory (dir) {
 	}
 }
 
+//=======
 //Remove everything from the output directory
+//=======
 function cleanDirectory (dir) {
 	if( fs.existsSync(dir) ) {
     fs.readdirSync(dir).forEach(function(file) {
@@ -54,22 +67,41 @@ function cleanDirectory (dir) {
   }
 
 }
+
+
+export function triggerReset () {
+	console.log('trigger reset');
+	reset = true;
+}
+
 //=======
+
+//=======
+
+export function checkReset () {
+	return reset;
+}
 
 //=======
 //Get the duration(filename) for an mp3
 //=======
 export const getDuration = (filePath) => {
-	console.log('getDuration');
-	console.log(filePath);
+
+	logger('getDuration');
+	logger(filePath);
 	return new Promise( (resolve, reject) => {
+		if(checkReset()) {
+			resolve({});
+			return;
+		}
+
 		mp3Duration(filePath, function (err, duration) {
 		  if (err) {
-				console.log(err.message);
+				logger(err.message);
 		  	//fail silently
 		  	resolve(err);
 		  } else {
-			  console.log('Your file is ' + duration + ' seconds long');
+			  logger('Your file is ' + duration + ' seconds long');
 			  duration = Math.round(duration);
 				let minutes = Math.floor(duration / 60);
 				let seconds = pad(duration - minutes * 60);
@@ -84,7 +116,7 @@ export const getDuration = (filePath) => {
 //Recursively loop though all input directories and create list of mp3 files found
 //=======
 export function getFileList (dir, filelist) {
-	console.log('getFileList');
+	logger('getFileList');
 
 	let files = fs.readdirSync(dir);
 	filelist = filelist || [];
@@ -99,7 +131,7 @@ export function getFileList (dir, filelist) {
 		}
 	});
 
-	console.log(filelist);
+	logger(filelist);
 	return filelist;
 }
 
@@ -109,6 +141,11 @@ export function getFileList (dir, filelist) {
 export function buildSignalQue (files) {
 	return new Promise( (resolve, reject) => {
 
+		if(checkReset()) {
+			resolve({});
+			return;
+		}
+
 		var signalQue = {};
 		let durationPromises = [];
 
@@ -117,6 +154,11 @@ export function buildSignalQue (files) {
 			durationPromises.push(getDurationPromise);
 		});
 		return Promise.all(durationPromises).then( (durations) => {
+			if(checkReset()) {
+				resolve({});
+				return;
+			}
+
 			durations.forEach( (duration, index)=> {
 				//has a duration and not an error
 				if(duration.duration) {
@@ -138,7 +180,7 @@ export function buildSignalQue (files) {
 			//resolve with the que when finished
 			resolve(signalQue);
 		}).catch( (error) => {
-			console.log(error);
+			logger(error);
 		});
 	});
 }
@@ -147,9 +189,18 @@ export function buildSignalQue (files) {
 // Process each individual signal
 //=======
 export function processSignal (signal, inputDir, outputDir) {
-	console.log('processSignal =============');
+
+
+	logger('processSignal =============');
 
 	return new Promise( (resolve, reject) => {
+
+		if(checkReset()) {
+			resolve();
+			return;
+		};
+
+
 		let channel = signal.inputFiles.length === 1 ? 1 : 0;
 		let dir = signal.inputFiles.length === 1 ? '/right' : '/left';
 		let outputFile = path.resolve(outputDir+dir, signal.duration.duration);
@@ -197,7 +248,7 @@ export function processSignal (signal, inputDir, outputDir) {
 		.audioCodec('libmp3lame')
 
 		.on('start', () =>  {
-			console.log('ffmpeg command start');
+			logger('ffmpeg started');
 			var entry = {
 				id : new Date().valueOf(),
 				input : signal.inputFiles,
@@ -206,10 +257,10 @@ export function processSignal (signal, inputDir, outputDir) {
 			};
 			window.state.actions.setLog(entry);
 			//Update Progress
-			//console.log('ffmpeg started');
+
 		})
 		.on('error', (error) => {
-			console.log('ffmpeg command error');
+			logger('ffmpeg command error');
 			var entry = {
 				id : new Date().valueOf(),
 				input : signal.inputFiles,
@@ -222,7 +273,7 @@ export function processSignal (signal, inputDir, outputDir) {
 			resolve({error : error});
 		})
 		.on('end', () => {
-			console.log('ffmpeg command ended');
+			logger('ffmpeg command ended');
 			var entry = {
 				id : new Date().valueOf(),
 				input : signal.inputFiles,
@@ -255,11 +306,10 @@ export function processSignals (signalQue, inputDir, outputDir) {
 	}
 
 	Promise.all(signalPromises).then( (signals)=> {
-		console.log(signals);
+		logger(signals);
 		signals.forEach( (signal)=> {
 			delete signalQue[signal.duration.duration];
 		});
-
 
 		//re call function
 		if( Object.keys(signalQue).length > 0) {
@@ -273,11 +323,14 @@ export function processSignals (signalQue, inputDir, outputDir) {
 				status : 'FINISHED'
 			};
 			window.state.actions.setLog(entry);
-			window.state.actions.finish();
+			if(!reset) {
+				window.state.actions.finish();
+			} else {
+				window.state.actions.reset();
+				reset = false;
+			}
 		}
-
 	});
-
 }
 
 export default function main (inputDir, outputDir) {
@@ -288,8 +341,8 @@ export default function main (inputDir, outputDir) {
 	var quePromise = buildSignalQue(fileList);
 
 	quePromise.then( (signalQue) =>{
-		console.log('========== que is ============');
-		console.log(signalQue);
+		logger('========== que is ============');
+		logger(signalQue);
 		window.state.actions.setTotal(Object.keys(signalQue).length);
 		processSignals(signalQue, inputDir, outputDir);
 	});

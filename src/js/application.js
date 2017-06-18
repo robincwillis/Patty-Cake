@@ -7,25 +7,20 @@ import App from 'Components/App';
 window.state = {
 	app : {
 		debug : false,
+		reset : false,
 		currentView : 0,
 		views : [0,1],
 		progress : 0,
 		log : '',
-		converstionStarted : false,
-		conversionInProgress : false,
-		conversionFinished : false,
-		converstionState : 0,
-		conversionStateCodes : [0,1,2],
 		inputDir : '',
 		outputDir : '',
 		merges : []
 	},
 	actions : {
 		setCurrentView : null,
-		setProgress : null,
 		setLog : null,
-		setConverstionState : null,
-		finish: null
+		finish: null,
+		reset: null
 	}
 };
 

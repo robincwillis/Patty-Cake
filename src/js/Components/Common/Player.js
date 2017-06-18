@@ -8,6 +8,8 @@ export default class Player extends Component {
 	constructor (props) {
 		super(props);
 		this.state = {
+			leftPlaying : false,
+			rightPlaying : false,
 			rightIndex : 0,
 			leftIndex : 0,
 		}
@@ -16,6 +18,9 @@ export default class Player extends Component {
 
 	setTrack (player, playlist, index) {
 		var track = playlist[index];
+		if(!track) {
+			return;
+		}
 		var src = "file:///" + track.dir + '/' + track.file;
 		player.src = src;
 
@@ -28,7 +33,7 @@ export default class Player extends Component {
 		var rightPlaylist = getFileList(this.props.outputDir + '/right');
 		var leftPlaylist = getFileList(this.props.outputDir + '/left');
 
-		console.log(rightPlaylist);
+
 		var leftIndex = this.state.leftIndex;
 		var rightIndex = this.state.rightIndex;
 
@@ -53,7 +58,8 @@ export default class Player extends Component {
 				leftIndex ++;
 			}
 			this.setState({
-				leftIndex : leftIndex
+				leftIndex : leftIndex,
+				leftPlaying : true
 			});
 			left.play();
 
@@ -67,7 +73,8 @@ export default class Player extends Component {
 				rightIndex ++;
 			}
 			this.setState({
-				rightIndex : rightIndex
+				rightIndex : rightIndex,
+				rightPlaying : true
 			});
 			right.play();
     });
@@ -78,7 +85,6 @@ export default class Player extends Component {
   }
 
 	render () {
-		console.log(this.props);
 
 		return (
 			<div>
